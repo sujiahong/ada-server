@@ -1,1 +1,1 @@
-#mj-server
+#ada-server
