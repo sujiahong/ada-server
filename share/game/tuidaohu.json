@@ -1,0 +1,50 @@
+{
+  "TotalPaiCount" : 136,
+  "SeatCount" : 4,
+  "BaseScore": 1,
+  "JuShu": [8,16],
+  "JuShuCost": [3,6],
+  "LeftMJCount": 0,
+  "GameState": {
+    "idle":"idle",
+    "start":"start",
+    "playing":"playing",
+    "end":"end"
+  },
+  "HoldLength":13,
+  "NeedFangKa":true,
+  "IsTestShuffle":false,
+  "HuPattern":
+  {
+    "Basic":{
+      "key":"basic",
+      "name":"小胡",
+      "score":1
+    },
+    "QingYiSe":{
+      "key": "qingyise",
+      "name":"清一色",
+      "score":9
+    },
+    "OneDragon":{
+      "key": "onedragon",
+      "name":"一条龙",
+      "score":9
+    },
+    "Yao13":{
+      "key": "yao13",
+      "name": "十三幺",
+      "score":27
+    },
+    "Pair7":{
+      "key": "pair7",
+      "name": "七对",
+      "score":9
+    },
+    "HaoPair7":{
+      "key": "haopair7",
+      "name": "豪华七对",
+      "score":18
+    }
+  }
+}

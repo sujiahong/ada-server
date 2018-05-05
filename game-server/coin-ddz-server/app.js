@@ -1,0 +1,48 @@
+const TAG = "coin-ddz-server 入口";
+const http_service = require("../httpService");
+const socket_service = require("../socketService");
+const mail = require('../../utils/mail');
+const GameConfigMgr = require("./game_config_mgr");
+const ErrorCode = require("../../share/error_code");
+const ServerConstant = require("../../share/server_constant");
+const GameConfig = require("../../share/game_config");
+const util = require('../../utils/util');
+//var RedisClient = require("../utils/redis_client");
+require("./gameCoinMgr"); 
+
+//从配置文件获取服务器信息
+var adaConfig = require('../../share/ada_config.js');
+
+var db = require('../../utils/db');
+db.init(adaConfig.mysql());
+
+//初始化log
+var bunyan = require('bunyan');
+var log_config = require('../../share/log_config');
+global.logger = bunyan.createLogger(log_config.majiang);
+
+logger.info('coin-ddz-server start...');
+logger.error("test error coin-ddz-server start");
+
+GameConfigMgr.loadAllConfig(__dirname + '/../../share/game/');
+
+var gameConfig = adaConfig.game_server();
+
+//开启HTTP服务
+var server = http_service.start(gameConfig);
+global.SERVER = server;
+
+//开启外网SOCKET服务
+socket_service.start(gameConfig);
+
+process.on('uncaughtException', function (err) {
+    //打印出错误
+    logger.error('uncaughtException error');
+    logger.error(err);
+    if(err && err.code == 'ECONNREFUSED'){
+        //do someting
+    }else{
+        //process.exit(1);
+    }
+    mail.send_mail('majiang-server uncaughtException', 'majiang-server uncaughtException');
+});

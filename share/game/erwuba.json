@@ -1,0 +1,56 @@
+{
+  "TotalPaiCount" : 138,
+  "SeatCount" : 4,
+  "BaseScore": 2,
+  "JuShu": [8,16],
+  "JuShuCost": [3,6],
+  "LeftMJCount": 10,
+  "HuaScore":[1,2],
+  "JiangPais":[1,4,7,10,13,16,19,22,25],
+  "ControlWeight":[90,5,5],
+  "IsControl":false,
+  "GameState": {
+    "idle":"idle",
+    "start":"start",
+    "playing":"playing",
+    "buhua":"buhua",
+    "end":"end"
+  },
+  "NeedFangKa":true,
+  "IsTestShuffle":false,
+  "HoldLength":13,
+
+  "HuPattern":
+  {
+    "Basic":
+    {
+      "key":"basic",
+      "name":"小胡",
+      "score":1
+    },
+    "QingYiSe":
+    {
+      "key": "qingyise",
+      "name":"清一色",
+      "score":2
+    },
+    "JiangYiSe":
+    {
+      "key": "jiangyise",
+      "name":"将一色",
+      "score":2
+    },
+    "FengYiSe":
+    {
+      "key": "fengyise",
+      "name": "风一色",
+      "score":2
+    },
+    "Pair7":
+    {
+      "key": "pair7",
+      "name": "七对",
+      "score":2
+    }
+  }
+}

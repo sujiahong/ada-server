@@ -1,0 +1,172 @@
+{
+  "TotalPaiCount" : 144,
+  "SeatCount" : 4,
+  "TotalKouZhangStep": 4,
+  "BaseScore": 1,
+  "JuShu": [8,16,32],
+  "JuShuCost": [3,6,12],
+  "JiFen":[300,500,1000],
+  "ControlWeight":[800,200,1],
+  "IsControl":false,
+  "IsMoPaiControl":false,
+  "SameTypeRatio":30,
+  "GoodPaiRatio":0,
+  "LeftMJCount": 12,
+  "isShowKou":false,
+  "GameState":
+  {
+    "idle":"idle",
+    "start":"start",
+    "kouzhang":"kouzhang",
+    "playing":"playing",
+    "end":"end"
+  },
+
+  "MaxKouZhangStep":4,
+  "HoldLength":13,
+  "MaxBaoPai": 12,
+  "NeedFangKa":true,
+  "IsTestShuffle":false,
+  "HuPattern":
+  {
+    "Null": "error",
+    "Normal":"Normal",
+    "Pair7":"Pair7",
+    "Yao13":"Yao13"
+  },
+
+  "FinalHuPattern":
+  {
+    "Basic":
+    {
+      "key":"basic",
+      "name":"底胡",
+      "score":40
+    },
+    "Hua":
+    {
+      "key":"hua",
+      "name":"花",
+      "score":20
+    },
+    "Kou":
+    {
+      "key":"kou",
+      "name":"扣牌",
+      "score":20
+    },
+    "MingGang":
+    {
+      "key":"minggang",
+      "name":"明杠",
+      "score":20
+    },
+    "AnGang":
+    {
+      "key":"angang",
+      "name":"暗杠",
+      "score":40
+    },
+    "QueMen":
+    {
+      "key":"quemen",
+      "name":"缺门",
+      "score":20
+    },
+    "HunYiSe":
+    {
+      "key": "hunyise",
+      "name":"混一色",
+      "score":100
+    },
+    "QingYiSe":
+    {
+      "key": "qingyise",
+      "name":"清一色",
+      "score":300
+    },
+    "ZiYiSe":
+    {
+      "key": "ziyise",
+      "name":"字一色",
+      "score":1000
+    },
+    "OneDragon":
+    {
+      "key": "onedragon",
+      "name": "一条龙",
+      "score":200
+    },
+    "MingFeng":
+    {
+      "key": "mingfeng",
+      "name":"明风",
+      "score":200
+    },
+    "ZhuiFeng":
+    {
+      "key": "zhuifeng",
+      "name": "追风",
+      "score":400
+    },
+    "Kou":
+    {
+      "key": "kou",
+      "name": "扣张",
+      "score":20
+    },
+    "Yao13":{
+      "key": "13yao",
+      "name": "十三幺",
+      "score": 1500
+    },
+    "SiGuiYi":
+    {
+      "key": "siguiyi",
+      "name": "四归一",
+      "score": 100
+    },
+    "ZhuoWuKui":
+    {
+      "key": "zhuowukui",
+      "name": "捉五魁",
+      "score": 100
+    },
+    "MenQing":
+    {
+      "key": "menqing",
+      "name": "门清",
+      "score": 100
+    },
+    "PengPeng":
+    {
+      "key": "pengpeng",
+      "name": "碰碰胡",
+      "score":100
+    },
+    "Pair7Count8":
+    {
+      "key": "pair7count8",
+      "name": "8张七对",
+      "score":200
+    } ,
+    "Pair7Count10":
+    {
+      "key": "pair7count10",
+      "name": "10张七对",
+      "score":400
+    } ,
+    "Pair7Count12":
+    {
+      "key": "pair7count12",
+      "name": "12张七对",
+      "score":600
+    } ,
+    "Pair7Count14":
+    {
+      "key": "pair7count14",
+      "name": "14张七对",
+      "score":800
+    }
+  }
+}

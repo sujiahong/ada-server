@@ -1,0 +1,32 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "coin-niu-server",
+            "program": "${workspaceFolder}/game-server/coin-niu-server/app.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "account-server",
+            "program": "${workspaceFolder}/account-server/app.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "home-server",
+            "program": "${workspaceFolder}/home-server/app.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "test-server",
+            "program": "${workspaceFolder}/test-server/app.js"
+        }
+    ]
+}

@@ -1,0 +1,61 @@
+http.get(ip,httpPort,"/get_server_info",reqdata,function(ret,data)
+
+当第4个玩家进入房间后本局开始
+1、服务器广播消息
+userMgr.broacastInRoom('user_ready_push',{userid:userId,ready:true},userId,true);
+2、游戏开始，洗牌，发牌，通知前端数据
+//开局时，通知前端必要的数据
+    for(var i = 0; i < seats.length; ++i){
+        var s = seats[i];
+        //通知玩家手牌
+        userMgr.sendMsg(s.userId,'game_holds_push',game.gameSeats[i].holds);
+        //通知还剩多少张牌
+        userMgr.sendMsg(s.userId,'mj_count_push',numOfMJ);
+        //通知还剩多少局
+        userMgr.sendMsg(s.userId,'game_num_push',roomInfo.numOfGames);
+    }
+终端行为：显示牌
+3、检查补花，通知前端有补花，补完花显示牌数
+userMgr.sendMsg(seatData.userId,'game_buhua_push');
+花杠
+userMgr.sendMsg(seatData.userId,'game_huagang_push');
+抢花
+userMgr.sendMsg(seatData.userId,'game_qianghua_push');
+牌数
+for(var i = 0; i < seats.length; ++i){
+        var s = seats[i];
+        //通知还剩多少张牌
+        userMgr.sendMsg(s.userId,'mj_count_push',numOfMJ);
+}
+终端行为：分别显示相应的UI
+4、开金 通知终端金
+通知金
+userMgr.broacastInRoom('game_jin_push', pai, game.gameSeats[game.turn].userId, true);
+牌数
+for(var i = 0; i < seats.length; ++i){
+        var s = seats[i];
+        //通知还剩多少张牌
+        userMgr.sendMsg(s.userId,'mj_count_push',numOfMJ);
+ }
+终端行为：把金显示在中间，更新牌数
+5、检查天胡，如果有通知玩家可以胡牌
+var data = {
+            pai:pai,
+            hu:seatData.canHu,
+            peng:seatData.canPeng,
+            gang:seatData.canGang,
+        };
+
+ //如果可以有操作，则进行操作
+  userMgr.sendMsg(seatData.userId,'game_action_push',data);
+终端行为：显示相应UI
+6、检查开局三金胡 如果有通知玩家 同5
+终端行为：显示UI
+7、抢金 如果有通知玩家可以胡牌
+终端行为：显示抢金UI
+8、同步数据，通知游戏开始，庄家可以出牌
+
+userMgr.sendMsg(s.userId,'game_begin_push',game.button);
+终端行为：庄家可以出牌
+
+

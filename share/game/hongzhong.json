@@ -1,0 +1,32 @@
+{
+  "TotalPaiCount": 112,
+  "SeatCount": 4,
+  "JuShu": [8, 16],
+  "FanZhang": [2, 4],
+  "JuShuCost": [3, 6],
+  "LeftMJCount": 0,
+  "JiangPais": [1, 4, 7, 10, 13, 16, 19, 22, 25],
+  "HongZhong": 33,
+  "FanZhangDT": 4000,
+  "GameState": {
+    "idle": "idle",
+    "start":"start",
+    "playing": "playing",
+    "end": "end"
+  },
+  "HoldLength": 13,
+  "NeedFangKa":true,
+  "IsTestShuffle":false,
+  "HuPattern": {
+    "Basic": {
+      "key": "basic",
+      "name": "小胡",
+      "score": 1
+    },
+    "Pair7": {
+      "key": "pair7",
+      "name": "七对",
+      "score": 10
+    }
+  }
+}

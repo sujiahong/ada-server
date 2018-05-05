@@ -1,0 +1,119 @@
+{
+  "basic":
+  {
+    "version": "v1.1.20",
+    "need_update":false,
+    "download_url":"http://dealer.niren.org/share/index.html",
+    "stop_server":{
+      "start_time":"2017-09-18 22:21:12",
+      "end_time":"2017-09-19 00:30:12"
+    }
+  },
+
+  "prize_whitelist":[],
+
+  "prize":
+  {
+    "item1":{
+      "name":"谢谢参与",
+      "type":"thanks",
+      "count":1,
+      "weight":10
+    },
+    "item2":{
+      "name":"房卡一张",
+      "type":"fangka",
+      "count":1,
+      "weight":2250
+    },
+    "item3":{
+      "name":"房卡三张",
+      "type":"fangka",
+      "count":3,
+      "weight":400
+    },
+    "item4":{
+      "name":"电话卡10元",
+      "type":"card10",
+      "count":2,
+      "weight":100
+    },
+    "item5":{
+      "name":"房卡一张",
+      "type":"fangka",
+      "count":1,
+      "weight":2250
+    },
+    "item6":{
+      "name":"小米5sPlus",
+      "type":"mphone",
+      "count":2,
+      "weight":0
+    },
+    "item7":{
+      "name":"房卡三张",
+      "type":"fangka",
+      "count":3,
+      "weight":400
+    },
+    "item8":{
+      "name":"iPad Mini",
+      "type":"ipad",
+      "count":0,
+      "weight":0
+    },
+    "item9":{
+      "name":"房卡一张",
+      "type":"fangka",
+      "count":1,
+      "weight":2250
+    },
+    "item10":{
+      "name":"电话卡20元",
+      "type":"card20",
+      "count":1,
+      "weight":100
+    }
+  },
+
+  "force_update":{
+    "default":{
+      "android": false,
+      "ios": false,
+      "other":false
+    },
+    "v1.1.30": {
+      "android": false,
+      "ios": false,
+      "other":false
+    }
+  },
+
+  "zjk":
+  {
+    "default":
+    {
+      "weixin_login":true,
+      "guest_login":false,
+      "support_pay": false,
+      "show_weixin":true,
+      "need_hot_update":true,
+      "weixin":"hbqp666",
+      "has_message":true,
+      "has_prize":true
+    },
+
+    "v1.1.32_other":
+    {
+      "weixin_login":true,
+      "guest_login":true,
+      "support_pay": false,
+      "show_weixin":true,
+      "need_hot_update":true,
+      "weixin":"hbqp666",
+      "has_message":true,
+      "has_prize":true
+    }
+  }
+
+}

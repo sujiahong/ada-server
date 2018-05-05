@@ -1,0 +1,48 @@
+{
+    "TotalPaiCount": 108,
+    "SeatCount": 4,
+    "BaseScore": [5, 10, 20, 50],
+    "JuShu": [8, 16, 32],
+    "JuShuCost": [3, 6, 12],
+    "LaiZiCount": [0, 1, 2],
+    "MaCount": [0, 1],
+    "LeftMJCount": 0,
+    "GameState": {
+        "idle": "idle",
+        "start": "start",
+        "playing": "playing",
+        "end": "end"
+    },
+    "HoldLength": 13,
+    "NeedFangKa": true,
+    "IsTestShuffle": true,
+    "GangScore": {
+        "DianGang": {
+            "key": "diangang",
+            "name": "点杠",
+            "scoreFunc": "M*2^(n+1)"
+        },
+        "HuiTouGang": {
+            "key": "huitougang",
+            "name": "回头杠",
+            "scoreFunc": "M*2^(n)"
+        },
+        "AnGang": {
+            "key": "angang",
+            "name": "暗杠",
+            "scoreFunc": "M*2^(n+1)"
+        }
+    },
+    "HuPattern": {
+        "ZiMo": {
+            "key": "ZiMo",
+            "name": "自摸",
+            "scoreFunc": "M*2^(a+b+n)"
+        },
+        "WuLaiZiMo": {
+            "key": "wulaizimo",
+            "name": "无赖子自摸",
+            "scoreFunc": "M*2^(a+b+n+1)"
+        }
+    }
+}
