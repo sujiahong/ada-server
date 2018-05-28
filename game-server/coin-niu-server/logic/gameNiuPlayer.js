@@ -26,6 +26,7 @@ var CoinNiuPlayer = function(opts){
     this.multiple = -1;  //叫的倍数
     this.cardInHand = [];  //手里的牌
     //this.trusteeship = 0;  //托管 0不托管  1托管
+    this.niuInHand = {};
 
     if (opts){
         this.roomId = opts.roomId;
@@ -47,6 +48,7 @@ var CoinNiuPlayer = function(opts){
         //this.trusteeship = opts.trusteeship;
         this.cardInHand = opts.cardInHand;
         this.multiple = opts.multiple;  //叫的倍数
+        this.niuInHand = opts.niuInHand;
     }
 }
 

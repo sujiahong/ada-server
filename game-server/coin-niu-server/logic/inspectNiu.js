@@ -64,7 +64,7 @@ exp.getWuHuaNiuCards = function(cards){
         }else if (arr[0] == 1){
             ret.type = getJinPaiNiuType(arr[2]);
         }else{
-            ret = getNiuTypeObj(valArr, getWuHuaNiuType);
+            ret = getNiuTypeObj(cards, valArr, getWuHuaNiuType);
             if (ret.type == NIU_WUHUA_TYPE.niu_0 && suitAndValArr[2]){
                 ret.type = NIU_WUHUA_TYPE.cunzhang;
             }
@@ -167,7 +167,7 @@ var getJinPaiNiuType = function(sum){
     }
 }
 
-var getNiuTypeObj = function(valArr, niuTypeFunc){
+var getNiuTypeObj = function(cards, valArr, niuTypeFunc){
     var len = valArr.length;
     for(var i = 0; i < 3; ++i){
         var val1 = valArr[i];
@@ -186,8 +186,8 @@ var getNiuTypeObj = function(valArr, niuTypeFunc){
                 }
                 console.log(i, ii, iii);
                 if ((val1 + val2 + val3) % 10 === 0){
-                    var arr = getArrOfAuxValArrAndSum(valArr, [i, ii, iii]);
-                    return {type: niuTypeFunc(arr[1]), valArr: valArr, niu: [val1, val2, val3], aux: arr[0]};
+                    var arr = getArrOfAuxValArrAndSum(cards, valArr, [i, ii, iii]);
+                    return {type: niuTypeFunc(arr[1]), valArr: valArr, niu: [cards[i], cards[ii], cards[iii]], aux: arr[0]};
                 }
             }
         }
@@ -195,13 +195,18 @@ var getNiuTypeObj = function(valArr, niuTypeFunc){
     return {type: NIU_WUHUA_TYPE.niu_0, valArr: valArr};
 }
 
-var getArrOfAuxValArrAndSum= function(valArr, niuIdxArr){
+var getArrOfAuxValArrAndSum = function(cards, valArr, niuIdxArr){
     var auxValArr = [];
     var sum = 0;
+    var val = 0;
     for (var i = 0, len = valArr.length; i < len; ++i){
         if (i != niuIdxArr[0] && i != niuIdxArr[1] && i != niuIdxArr[2]){
-            auxValArr.push(valArr[i]);
-            sum += valArr[i];
+            auxValArr.push(cards[i]);
+            val = valArr[i];
+            if (val > 10){
+                val = 10;
+            }
+            sum += val;
         }
     }
     return [auxValArr, sum];
@@ -262,7 +267,7 @@ exp.getJingDianNiuCards = function(cards){
         }else if(arr[0] == 4 && arr[2] == 1){
             ret.type = NIU_JINGDIAN_TYPE.niu_yin;
         }else{
-            ret = getNiuTypeObj(valArr, getJingDianNiuType);
+            ret = getNiuTypeObj(cards, valArr, getJingDianNiuType);
         }
     }
     return ret;

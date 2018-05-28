@@ -51,7 +51,6 @@ module.exports = CoinNiuRoom;
 
 CoinNiuRoom.prototype.init = function (roomId, rule) {
     this.roomId = roomId;
-    this.startStamp = Date.now();
     this.roomLaw = rule.roomLaw;
     this.uplimitPersons = rule.maxPersons;
     this.GPSActive = rule.GPSActive;
@@ -68,9 +67,9 @@ CoinNiuRoom.prototype.init = function (roomId, rule) {
 }
 
 CoinNiuRoom.prototype.isStartRun = function(){
-    // if (this.getPlayerNum() < 2){
-    //     return false;
-    // }
+    if (this.getPlayerNum() < 2){
+        return false;
+    }
     var allReady = 1;
     for (var i in this.players) {
         allReady &= this.players[i].readyStat;
@@ -82,6 +81,7 @@ CoinNiuRoom.prototype.isStartRun = function(){
 }
 
 CoinNiuRoom.prototype.StartOneRun = function(){
+    this.startStamp = Date.now();
     this.shuffleCard();
     this.dealCard();
     this.curRunCount++;
@@ -138,27 +138,37 @@ CoinNiuRoom.prototype.isFlopEnd = function(){
     }
     return true;
 }
-///return   {闲家id: {type: "", win: 1, coin: 123, userId: ""}}
-CoinNiuRoom.prototype.startScore = function(){
+
+CoinNiuRoom.prototype.findoutNiuType = function(cards){
     var niuCardsFunc = null;
-    var NIU_MULTI = null;
     if (this.roomLaw == constant.NIU_PLAY_TYPE.jingdian){
         niuCardsFunc = inspect.getJingDianNiuCards;
-        NIU_MULTI = constant.NIU_JINGDIAN_MULTI;
     }else{
         niuCardsFunc = inspect.getWuHuaNiuCards;
+    }
+    return niuCardsFunc(cards);
+}
+
+///return   {闲家id: {type: "", win: 1, coin: 123, userId: ""}}
+CoinNiuRoom.prototype.startScore = function(){
+    this.endStamp = Date.now();
+    var NIU_MULTI = null;
+    if (this.roomLaw == constant.NIU_PLAY_TYPE.jingdian){
+        NIU_MULTI = constant.NIU_JINGDIAN_MULTI;
+    }else{
         NIU_MULTI = constant.NIU_WUHUA_MULTI;
     }
     var scoreRet = {};
     var bankerCoinIncr = 0;
     var banker = this.players[this.bankerId];
-    var bankerNiu = niuCardsFunc(banker.cardInHand);
+    var bankerNiu = banker.niuInHand;
     for(var uid in this.players){
         if(uid != this.bankerId){
             var player = this.players[uid];
-            var otherNiu = niuCardsFunc(player.cardInHand);
+            var otherNiu = player.niuInHand;
             var ret = inspect.compareCards(bankerNiu, otherNiu);
             var incr = this.baseCoin * banker.multiple * player.multiple * NIU_MULTI[ret.type]* ret.win;
+            console.log("uueue  ", ret, incr);
             banker.coinNum += incr;
             bankerCoinIncr += incr;
             player.coinNum -= incr;
@@ -279,8 +289,12 @@ CoinNiuRoom.prototype.leaveRoom = function(userId){
         player.readyStat = 0;
         player.flopStat = 0;
         player.cardInHand = [];
+        player.niuInHand = {};
         player.multiple = -1;  //叫的倍数
         delete this.players[userId];
+        if (this.getPlayerNum() == 0){
+            this.clearRun();
+        }
         return errcode.OK;
     }else{
         player = this.witnessPlayers[userId];
@@ -290,10 +304,17 @@ CoinNiuRoom.prototype.leaveRoom = function(userId){
             player.readyStat = 0;
             player.flopStat = 0;
             player.cardInHand = [];
+            player.niuInHand = {};
             player.multiple = -1;  //叫的倍数
             delete this.witnessPlayers[userId];
+            if (this.getPlayerNum() == 0){
+                this.clearRun();
+            }
             return errcode.OK;
         }else{
+            if (this.getPlayerNum() == 0){
+                this.clearRun();
+            }
             return errcode.NOT_IN_NIU_ROOM;
         }
     }
@@ -306,6 +327,7 @@ CoinNiuRoom.prototype.clearRun= function(){
         player.readyStat = 0;
         player.flopStat = 0;
         player.cardInHand = [];
+        player.niuInHand = {};
         player.multiple = -1;  //叫的倍数
     }
 }
@@ -330,6 +352,7 @@ CoinNiuRoom.prototype.getClientRoomData = function(userId){
     for (var uid in room.players){
         var curPlayer = room.players[uid];
         var handCards;
+        var niuData = {};
         if (uid == userId){
             if (curPlayer.flopStat == 0){
                 if (isRobEnd){
@@ -342,6 +365,13 @@ CoinNiuRoom.prototype.getClientRoomData = function(userId){
                 }
             }else{
                 handCards = curPlayer.cardInHand;
+                niuData.type = curPlayer.niuInHand.type;
+                if (curPlayer.niuInHand.niu){
+                    niuData.niu = curPlayer.niuInHand.niu;
+                }
+                if (curPlayer.niuInHand.aux){
+                    niuData.aux = curPlayer.niuInHand.aux;
+                }
             }
         }else{
             if (curPlayer.flopStat == 0){
@@ -356,6 +386,13 @@ CoinNiuRoom.prototype.getClientRoomData = function(userId){
                 }
             }else{
                 handCards = curPlayer.cardInHand;
+                niuData.type = curPlayer.niuInHand.type;
+                if (curPlayer.niuInHand.niu){
+                    niuData.niu = curPlayer.niuInHand.niu;
+                }
+                if (curPlayer.niuInHand.aux){
+                    niuData.aux = curPlayer.niuInHand.aux;
+                }
             }
         }
         roomData.players[uid] = {
@@ -373,6 +410,7 @@ CoinNiuRoom.prototype.getClientRoomData = function(userId){
             flopStat: curPlayer.flopStat,
             multiple: curPlayer.multiple,
             cardInHand: handCards,
+            niuInHand: niuData,
             online: (curPlayer.frontServerId == "") ? 0 : 1
         }
 

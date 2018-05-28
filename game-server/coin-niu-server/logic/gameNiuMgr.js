@@ -1,13 +1,17 @@
 "use strict";
 const TAG = "gameNiuMgr.js";
+const async = require("async");
 const niuRedis = require("../../redis/redisCoinNiu");
 const errcode = require("../../shared/errcode");
 const constant = require("../../shared/constant");
 const niuRoom = require("./gameNiuRoom");
 const userRecord = require("../../parse/UserRecord");
+const feeRecord =  require("../../parse/RoomFeeRecord");
+const combatRecord = require("../../parse/NiuCombatRecord");
 const pusher = require("../../room_mgr/coin_niu_mgr/push");
 const niuPlayer = require("./gameNiuPlayer");
 const util = require("../../util/utils");
+const httpUtil = require("../../util/httpUtil");
 
 var GameNiuMgr = function(){
     this.rooms = {};/////roomId -- room
@@ -93,19 +97,30 @@ mgr.robBanker = function(roomId, userId, multi, next){
             if (player.multiple > -1){
                 return next(null, {code: errcode.NIU_ROOM_HAVE_ROBED});
             }
+            if (player.coinNum < multi * 8 * room.baseCoin * (room.getPlayerNum() - 1)){
+                return next(null, {code: errcode.COIN_NOT_ENOUGH});
+            }
             player.robMultiple(multi);
             var multiAndEndArr = room.getMaxMultiAndEnd();
             console.log("#####  ", multiAndEndArr);
             if (multiAndEndArr[1]){//抢庄结束
                 room.bankerId = room.lookupBanker(multiAndEndArr[0]);
-                for (var uid in room.players){
-                    if(uid != room.bankerId){
-                        var player = room.players[uid];
-                        player.multiple = -1;  //叫的倍数
-                    }
+                var banker = room.getPlayerByUid(room.bankerId);
+                if (multiAndEndArr[0] == 0){
+                    banker.robMultiple(1);
                 }
+                pusher.pushMultiple(room, userId, 1, function(err, data){
+                    for (var uid in room.players){
+                        if(uid != room.bankerId){
+                            var player = room.players[uid];
+                            player.multiple = -1;  //叫的倍数
+                        }
+                    }
+                    next(err, data);
+                });
+            }else{
+                pusher.pushMultiple(room, userId, 1, next);
             }
-            pusher.pushMultiple(room, userId, 1, next);
         }else{
             next(null, {code: ecode});
         }
@@ -122,6 +137,10 @@ mgr.robMultiple = function(roomId, userId, multi, next){
             }
             if (player.multiple > -1){
                 return next(null, {code: errcode.NIU_ROOM_HAVE_CALL_MULTI});
+            }
+            var banker = room.getPlayerByUid(room.bankerId);
+            if (player.coinNum < multi * banker.multiple * 8 * room.baseCoin){
+                return next(null, {code: errcode.COIN_NOT_ENOUGH});
             }
             player.robMultiple(multi);
             pusher.pushMultiple(room, userId, 2, function(){
@@ -153,12 +172,16 @@ mgr.flop = function(roomId, userId, next){
             for (var i = 0, len = player.cardInHand.length; i < len; ++i){
                 cards[i] = player.cardInHand[i];
             }
-            pusher.pushFlop(room, {[userId]: cards}, function(){
+            player.niuInHand = room.findoutNiuType(player.cardInHand);
+            pusher.pushFlop(room, {[userId]: [cards, player.niuInHand]}, function(){
                 if (room.isFlopEnd()){
                     var ret = room.startScore();
-                    pusher.pushResult(room, ret, function(){
-                        room.clearRun();
-                        next(null, {code: errcode.OK});
+                    console.log(saveRoundEndData, "@@@@@@@@@@@@@@@@")
+                    saveRoundEndData(room, ret, function(){
+                        pusher.pushResult(room, ret, function(){
+                            room.clearRun();
+                            next(null, {code: errcode.OK});
+                        });
                     });
                 }else{
                     next(null, {code: errcode.OK});
@@ -168,6 +191,124 @@ mgr.flop = function(roomId, userId, next){
             next(null, {code: ecode});
         }
     });
+}
+
+var saveRoundEndData = function(room, ret, next){
+    var _save = function(){
+        saveMongoCombatGain(room, ret, function(err, combatRecord){
+            if (err){
+                console.warn(TAG, "saveRoundEndData 保存战绩mongo出错, 3妙后再试一次！！", err);
+                return setTimeout(_save, 3000);
+            }
+            for (let uid in room.players){
+                saveRedisCombatGain(uid, combatRecord);
+                rebateRoomFeeToPromoter(room, uid);
+            }
+            next();
+        });
+    }
+    _save();
+}
+
+var saveMongoCombatGain = function(room, scoreRet, next){
+    util.generateUniqueId(8, niuRedis.isExistViewId, function(viewId){
+        var param = {
+            roomId: room.roomId,
+            roomLaw: room.roomLaw,
+            bankerId: room.bankerId,
+            baseCoin: room.baseCoin,
+            startStamp: room.startStamp,
+            endStamp: room.endStamp,
+            viewId: viewId,
+            players: []
+        };
+        for (var uid in room.players){
+            var player = room.players[uid];
+            var resData = {
+                userId: uid,
+                nickname: player.nickname,
+                iconUrl: player.userIcon,
+                handCard: player.cardInHand,
+                niuType: player.niuInHand.type,
+                multi: player.multiple,
+                remainderCoin: player.coinNum,
+                coinIncr: scoreRet[uid].coinIncr
+            };
+            param.players.push(resData);
+        }
+        console.log("222222222222222222222", param);
+        combatRecord.addRecord(param, function(err, record){
+            if (err){
+                return next(err);
+            }
+            console.log("33333333333333333");
+            niuRedis.setViewIdCombatId(viewId, record.id.toString());
+            next(null, record);
+        });
+    });
+}
+
+var saveRedisCombatGain = function(userId, record){
+    var _save = function(){
+        niuRedis.getNiuCombatGain(userId, function(err, gainArr){
+            if (err){
+                console.log(TAG, "saveCombatGain 保存战绩redis出错, error: ", err);
+                return setTimeout(_save, 3000);
+            }
+            if (!gainArr){
+                gainArr = [];
+            }
+            var players = [];
+            var rePlayers = record.get("players");
+            for (var i in rePlayers){
+                var player = rePlayers[i];
+                players.push({userId: player.userId, name: player.nickname, coinIncr: player.coinIncr});
+            }
+            var data = {
+                roomId: record.get("roomId"),
+                roomLaw: record.get("roomLaw"),
+                baseCoin: record.get("baseCoin"),
+                bankerId: record.get("bankerId"),
+                storeStamp: record.get("endStamp"),
+                viewCodeId: record.get("viewCodeId"),
+                combatId: record.id.toString(),
+                players: players
+            };
+            gainArr.unshift(data);
+            if (gainArr.length > 10){
+                gainArr.pop();
+            }
+            niuRedis.setNiuCombatGain(userId, gainArr);
+        });
+    }
+    _save();
+}
+
+var rebateRoomFeeToPromoter = function(room, uid){
+    let curPlayer = room.players[uid];
+    var _rebate = function(){
+        userRecord.updateUserByUserId(uid, {coinNum: curPlayer.coinNum}, function(error, record){
+            if (error){
+                return setTimeout(_rebate, 2000);
+            }
+            var param = {
+                userId: uid,
+                userNo: curPlayer.userNo,
+                roomId: room.roomId,
+                gamePlay: constant.GAME_PLAY.niu_niu,
+                fee: room.baseCoin,
+                remainder: curPlayer.coinNum,
+                upPromoterId: record.get("bindId"),
+                upUserNo: record.get("bindUserNo")
+            };
+            httpUtil.rebateRequest(param, function(code){
+                if (code != errcode.OK){
+                    setTimeout(_rebate, 2000);
+                }
+            });
+        });
+    }
+    _rebate();
 }
 
 mgr.seatdown = function(roomId, userId, seatIdx, next){
